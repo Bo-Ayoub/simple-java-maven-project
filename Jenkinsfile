@@ -16,26 +16,16 @@ pipeline {
             }
         }
 
-        stage('Install Maven') {
-            steps {
-                script {
-                    // Install Maven if it is not already available
-                    sh '''
-                    if ! [ -x "$(command -v mvn)" ]; then
-                        echo "Maven is not installed. Installing Maven..."
-                        sudo apt update
-                        sudo apt install -y maven
-                    else
-                        echo "Maven is already installed."
-                    fi
-                    '''
-                }
-            }
-        }
-
         stage('Build and Test') {
             steps {
                 script {
+                    // Verify Maven is installed
+                    sh '''
+                    if ! [ -x "$(command -v mvn)" ]; then
+                        echo "Maven is not installed. Please ensure Maven is pre-installed on the Jenkins agent."
+                        exit 1
+                    fi
+                    '''
                     // Build and run tests using Maven
                     sh 'mvn clean install'
                 }

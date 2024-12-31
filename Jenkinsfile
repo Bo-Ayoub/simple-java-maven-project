@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.7-openjdk-17' // Maven Docker image with OpenJDK 17
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = 'ayoubbale/simple-java-app'
@@ -18,6 +14,12 @@ pipeline {
         }
 
         stage('Build and Test') {
+            agent {
+                docker {
+                    image 'maven:3.8.7-openjdk-17' // Maven Docker image for this stage
+                    args '-v /root/.m2:/root/.m2' // Optional: Mount Maven cache to avoid re-downloading dependencies
+                }
+            }
             steps {
                 script {
                     sh 'mvn clean install'

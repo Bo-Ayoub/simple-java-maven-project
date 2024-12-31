@@ -1,17 +1,18 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.8.7-openjdk-17' // Maven Docker image with OpenJDK 17
+        }
+    }
 
     environment {
-        // Docker image name (replace 'ayoubbale/simple-java-app' with your details)
         DOCKER_IMAGE = 'ayoubbale/simple-java-app'
-        // Docker Hub credentials (replace with your actual credentials ID in Jenkins)
         DOCKER_CREDENTIALS_ID = '8e05ab4c-bbb6-4c95-8140-c3b40569e8d1'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                // Cloning your GitHub repository
                 git 'https://github.com/Bo-Ayoub/simple-java-maven-project.git'
             }
         }
@@ -19,14 +20,6 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                    // Verify Maven is installed
-                    sh '''
-                    if ! [ -x "$(command -v mvn)" ]; then
-                        echo "Maven is not installed. Please ensure Maven is pre-installed on the Jenkins agent."
-                        exit 1
-                    fi
-                    '''
-                    // Build and run tests using Maven
                     sh 'mvn clean install'
                 }
             }
@@ -35,7 +28,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image
                     sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
             }
@@ -44,12 +36,9 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    // Login to Docker Hub using credentials stored in Jenkins
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     }
-
-                    // Push Docker image to Docker Hub
                     sh 'docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                 }
             }
@@ -58,16 +47,9 @@ pipeline {
         stage('Deploy Dockerized Project') {
             steps {
                 script {
-                    // Pull the Docker image from Docker Hub
                     sh 'docker pull ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-
-                    // Stop any running container with the same name
                     sh 'docker stop mycontainer || true'
-
-                    // Remove the container if exists
                     sh 'docker rm mycontainer || true'
-
-                    // Run the Docker container
                     sh 'docker run -d --name mycontainer ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                 }
             }

@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // Docker image name (replace 'myusername' and 'simple-java-app' with your details)
+        // Docker image name (replace 'ayoubbale/simple-java-app' with your details)
         DOCKER_IMAGE = 'ayoubbale/simple-java-app'
         // Docker Hub credentials (replace with your actual credentials ID in Jenkins)
         DOCKER_CREDENTIALS_ID = '8e05ab4c-bbb6-4c95-8140-c3b40569e8d1'
@@ -11,7 +11,25 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Bo-Ayoub/simple-java-maven-project.git' // Replace with your GitHub project URL
+                // Cloning your GitHub repository
+                git 'https://github.com/Bo-Ayoub/simple-java-maven-project.git'
+            }
+        }
+
+        stage('Install Maven') {
+            steps {
+                script {
+                    // Install Maven if it is not already available
+                    sh '''
+                    if ! [ -x "$(command -v mvn)" ]; then
+                        echo "Maven is not installed. Installing Maven..."
+                        sudo apt update
+                        sudo apt install -y maven
+                    else
+                        echo "Maven is already installed."
+                    fi
+                    '''
+                }
             }
         }
 

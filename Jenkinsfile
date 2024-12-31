@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'ayoubbale/simple-java-app'
-        DOCKER_CREDENTIALS_ID = '8e05ab4c-bbb6-4c95-8140-c3b40569e8d1'
+        DOCKER_CREDENTIALS_ID = 'b99862ec-f40f-4f0e-9065-e5bb68263348'
     }
 
     stages {

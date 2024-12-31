@@ -16,8 +16,8 @@ pipeline {
         stage('Build and Test') {
             agent {
                 docker {
-                    image 'maven:3.8-openjdk-17' // Maven Docker image for this stage
-                    args '-v /root/.m2:/root/.m2' // Optional: Mount Maven cache to avoid re-downloading dependencies
+                    image 'maven:3.8-openjdk-17' 
+                    args '-v /root/.m2:/root/.m2' 
                 }
             }
             steps {
@@ -50,9 +50,9 @@ pipeline {
             steps {
                 script {
                     sh 'docker pull ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-                    sh 'docker stop mycontainer || true'
-                    sh 'docker rm mycontainer || true'
-                    sh 'docker run -d --name mycontainer ${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                    sh 'docker stop javaContainer|| true'
+                    sh 'docker rm javaContainer|| true'
+                    sh 'docker run -d --name javaContainer ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                 }
             }
         }
